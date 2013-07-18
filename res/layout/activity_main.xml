@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/black"
+    tools:context=".MainActivity" >
+    
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_browse_new"
+        android:textColor="@color/white"
+        android:onClick="browseNew" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_find_new"
+        android:textColor="@color/white"
+        android:onClick="findNew" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_browse_exist"
+        android:textColor="@color/white"
+        android:onClick="browseExist" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_find_exist"
+        android:textColor="@color/white"
+        android:onClick="findExist" />
+</LinearLayout>

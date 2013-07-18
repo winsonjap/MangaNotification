@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/browse_manga_new"
+		android:title="@string/button_browse_new" />
+	<item android:id="@+id/find_manga_new"
+		android:title="@string/button_find_new" />
+</menu>

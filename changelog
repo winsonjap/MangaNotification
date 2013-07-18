@@ -1,0 +1,25 @@
+------------LOG--------------
+07/06/2013
+- Button 'Browse new Manga' pressable
+- Browse new Manga -
+	- See the list of manga from database
+	- Refresh button to refresh the list online
+	- Differentiate saved manga and not
+
+07/15/2013
+- Fix getLastchapter in OnlineParser.java
+- Add all detail grabber functions
+	
+07/17/2013
+- Fix get Detail problem and save to database (slow)
+- Manga detail works fine
+- Refresh List correctly
+- Add unsave button and function
+-Refactor
+
+Next Planning
+- Browse New Manga -
+	- Refactor 'unsave' function
+	- Check img url to get image
+	- Add functionalities to other buttons
+	

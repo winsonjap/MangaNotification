@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/list_selector"
+    android:orientation="horizontal"
+    android:padding="5dip" >
+ 
+    <!--  ListRow Left sied Thumbnail image -->
+    <LinearLayout android:id="@+id/thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dip"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="5dip">
+ 
+        <ImageView
+            android:id="@+id/list_image"
+            android:layout_width="50dip"
+            android:layout_height="50dip" />
+ 
+    </LinearLayout>
+ 
+    <!-- Title Of Manga-->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/thumbnail"
+        android:layout_toRightOf="@+id/thumbnail"
+        android:inputType="none"
+        android:textIsSelectable="false"
+		android:editable="false"
+        android:text="Law of Ueki"
+        android:textColor="#040404"
+        android:typeface="sans"
+        android:textSize="15dip"
+        android:textStyle="bold"/>
+ 
+    <!-- Author Name -->
+    <TextView
+        android:id="@+id/author"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="none"
+        android:textIsSelectable="false"
+		android:editable="false"
+        android:layout_below="@id/title"
+        android:textColor="#343434"
+        android:textSize="10dip"
+        android:layout_marginTop="1dip"
+        android:layout_toRightOf="@+id/thumbnail"
+        android:text="Fujiko F Fujio" />
+ 
+    <!-- Latest Chapter -->
+    <TextView
+        android:id="@+id/last_chapter"
+        android:layout_width="wrap_content"
+        android:inputType="none"
+        android:textIsSelectable="false"
+        android:layout_toRightOf="@+id/thumbnail"
+        android:layout_below="@id/author"
+        android:layout_marginTop="0.5dip"
+		android:editable="false"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:text=""
+        android:textSize="10dip"
+        android:textColor="#10bcc9"
+        android:textStyle="bold"/>
+    <!-- Read Chapter -->
+    <TextView
+        android:id="@+id/read_chapter"
+        android:layout_width="wrap_content"
+        android:inputType="none"
+        android:textIsSelectable="false"
+        android:layout_toRightOf="@+id/thumbnail"
+        android:layout_below="@id/last_chapter"
+        android:layout_marginTop="0.5dip"
+		android:editable="false"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:text=""
+        android:textSize="10dip"
+        android:textColor="#FF0000"
+        android:textStyle="bold"/>
+    
+    <!-- Checkbox image -->
+    <LinearLayout android:id="@+id/check_thumbnail"
+        android:layout_alignParentRight="true"
+        android:gravity="right"
+        android:layout_marginTop="30dip"
+        android:layout_marginRight="10dip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/image_bg">
+	    <ImageView
+	            android:id="@+id/check_image"
+	            android:layout_width="10dip"
+	            android:layout_height="10dip" />
+	</LinearLayout>
+ 
+</RelativeLayout>

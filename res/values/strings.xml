@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Manga Notification</string>
+    <string name="action_settings">Settings</string>
+    <string name="button_browse_new">Browse Manga</string>
+    <string name="button_browse_exist">Browse Saved Manga</string>
+    <string name="button_find_new">Find Manga</string>
+    <string name="button_find_exist">Find Saved Manga</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="confirm_refresh"></string>
+    <string name="continue_string">Continue</string>
+    <string name="save_string">Save this manga</string>
+    <string name="cancel_string">Cancel</string>
+    <string name="confirm_string">Okay!</string>
+    
+    
+    <color name="black">#000000</color>
+    <color name="white">#fff</color>
+
+    <string name="title_activity_browse_new">Browse Manga Online</string>
+
+</resources>
