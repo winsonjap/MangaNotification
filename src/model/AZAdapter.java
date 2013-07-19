@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import com.example.manganotification.R;
@@ -26,6 +25,13 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 @SuppressLint("DefaultLocale")
+/**
+ * Layout of the list view
+ * It will show the layout
+ * @author winson
+ *
+ * @param <T>
+ */
 public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer, Filterable {
 	private ArrayList<String> mangaTitles;
 	private HashMap<String, Integer> azIndexer;
@@ -39,11 +45,12 @@ public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer,
 		this.origMangaList = objects;
 		this.mangaList = objects;
 		this.imageLoader=new ImageLoader(context.getApplicationContext());
-
-		ArrayList<Manga>mangaList = new ArrayList<Manga>((ArrayList<Manga>) objects);
 		this.setIndexer();
 	}
 	
+	/**
+	 * Set alphabet indexer on the right side of the page
+	 */
 	public void setIndexer() {
 		mangaTitles = getMangaTitle(mangaList);
 		azIndexer = new HashMap<String, Integer>(); //stores the positions for the start of each letter
@@ -69,6 +76,11 @@ public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer,
 		keyList.toArray(sections);
 	}
 	
+	/**
+	 * Function to get list of all titles as array
+	 * @param mangaList - array of manga to get titles from
+	 * @return the list of titles (string)
+	 */
 	private ArrayList<String> getMangaTitle(ArrayList<Manga> mangaList) {
 		ArrayList<String> ret = new ArrayList<String>();
 		String currTitle;
@@ -79,6 +91,11 @@ public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer,
         return ret;
 	}
 	
+	/**
+	 * Function to capitalize string
+	 * @param string - to be capitalized
+	 * @return capitalized string
+	 */
 	private String capitalize(String string)
 	{
 		if (string == null)
@@ -88,6 +105,9 @@ public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer,
 	    return Character.toUpperCase(string.charAt(0)) + string.substring(1);
 	}
 	
+	/**
+	 * Function to show the view of each row
+	 */
 	public View getView(int position, View convertView, ViewGroup parent){
 
 		// assign the view we are converting to a local variable
@@ -101,7 +121,7 @@ public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer,
 		
 		Manga manga;
 		if(position >= mangaList.size())
-			manga = new Manga("","","","","","","",0);
+			manga = new Manga(-1,"","","","","","","",0);
 		else
 			manga= mangaList.get(position);
 		TextView title = (TextView) v.findViewById(R.id.title);
@@ -136,8 +156,12 @@ public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer,
 
 	@Override
 	public int getPositionForSection(int section) {
-		if(sections.length > 0) {
+		if(sections.length > 1) {
 			String letter = sections[section];
+			return azIndexer.get(letter);
+		}
+		else if(sections.length == 1) { //if there's only 1 item it will throw error
+			String letter = sections[0];
 			return azIndexer.get(letter);
 		}
 		return 0;
@@ -154,6 +178,9 @@ public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer,
 		return sections; // to string will be called to display the letter
 	}
 	
+	/**
+	 * Filtering
+	 */
 	@Override
 	public Filter getFilter() {
 		Filter filter = new Filter() {
@@ -161,6 +188,7 @@ public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer,
 			@Override
 			protected void publishResults(CharSequence constraint, FilterResults results) {
 				mangaList = (ArrayList<Manga>) results.values;
+				setIndexer();
 				notifyDataSetChanged();
 			}
 

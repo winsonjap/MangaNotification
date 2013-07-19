@@ -11,12 +11,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import sql.MangaListAccesser;
-import sql.MangaListTable.MangaList;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+/**
+ * Class to parse one manga to get the detail from online information
+ * @author winson
+ *
+ */
 public class OnlineParseOne extends AsyncTask<String, Void, String> {
 	public MangaListAccesser mDbHelper;
 	public Manga manga;
@@ -43,44 +45,6 @@ public class OnlineParseOne extends AsyncTask<String, Void, String> {
 			System.err.println("We're having some trouble connecting to the server");
 			System.err.println("Sorry for the inconvenience, please try again later!");
 		}
-	}
-
-	private Manga getSavedMangaData(String title, String url) {
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		// Define a projection that specifies which columns from the database
-		// you will actually use after this query.
-		String[] projection = {
-				MangaList.COLUMN_NAME_TITLE,
-				MangaList.COLUMN_NAME_AUTHOR,
-				MangaList.COLUMN_NAME_URL,
-				MangaList.COLUMN_NAME_LAST_CHAPTER,
-				MangaList.COLUMN_NAME_READ_CHAPTER,
-				MangaList.COLUMN_NAME_LAST_UPDATED,
-				MangaList.COLUMN_NAME_IMG_URL,
-				MangaList.COLUMN_NAME_IS_SAVED
-		};
-		String selection = MangaList.COLUMN_NAME_TITLE + "=?";
-		selection += " and ";
-		selection += MangaList.COLUMN_NAME_URL + "=?";
-
-		String[] selectionArgs = {title, url};
-		// How you want the results sorted in the resulting Cursor
-		String sortOrder = MangaList.COLUMN_NAME_TITLE + " ASC";
-		Cursor c = db.query(
-				MangaList.TABLE_NAME,  // The table to query
-				projection,            // The columns to return
-				selection,         	   // The columns for the WHERE clause
-				selectionArgs, 	       // The values for the WHERE clause
-				null,                  // don't group the rows
-				null,                  // don't filter by row groups
-				sortOrder              // The sort order
-				);
-		if(c.moveToFirst()) {
-			Manga manga = GeneralHelper.getData(c);
-			if(manga.isSaved == 1)
-				return manga;
-		}
-		return null;
 	}
 
 	private String getImgUrlTag(Document detailDoc) {

@@ -1,10 +1,8 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Date;
-
-
+@SuppressWarnings("rawtypes")
 public class Manga implements Comparable{
+	public int id;
 	public String title = "";
 	public String author;
 	public String newestChapter;
@@ -14,9 +12,10 @@ public class Manga implements Comparable{
 	public String imgUrl;
 	public int isSaved;
 	
-	public Manga(String title, String author, String newestChapter, 
+	public Manga(int id, String title, String author, String newestChapter, 
 				 String readChapter, String lastUpdated, 
 				 String url, String imgUrl, int isSaved) {
+		this.id = id;
 		this.title = title;
 		this.author = author;
 		this.newestChapter = newestChapter;

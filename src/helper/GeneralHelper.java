@@ -1,11 +1,9 @@
 package helper;
 
+import java.util.ArrayList;
+
 import model.FunctorsInterface;
 import model.Manga;
-
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import com.example.manganotification.R;
 
@@ -72,6 +70,7 @@ public class GeneralHelper {
 	}
 	
 	public static Manga getData(Cursor c) {
+		int id = c.getInt(c.getColumnIndexOrThrow(MangaList.COLUMN_NAME_MANGA_ID));
 		String title = c.getString(c.getColumnIndexOrThrow(MangaList.COLUMN_NAME_TITLE));
 		String author = c.getString(c.getColumnIndexOrThrow(MangaList.COLUMN_NAME_AUTHOR));
 		String url = c.getString(c.getColumnIndexOrThrow(MangaList.COLUMN_NAME_URL));
@@ -80,7 +79,7 @@ public class GeneralHelper {
 		String lastUpdated = c.getString(c.getColumnIndexOrThrow(MangaList.COLUMN_NAME_LAST_UPDATED));
 		String imgUrl = c.getString(c.getColumnIndexOrThrow(MangaList.COLUMN_NAME_IMG_URL));
 		int isSaved = c.getInt(c.getColumnIndexOrThrow(MangaList.COLUMN_NAME_IS_SAVED));
-		Manga manga = new Manga(title, author, lastChapter, readChapter, lastUpdated, url, imgUrl, isSaved);
+		Manga manga = new Manga(id, title, author, lastChapter, readChapter, lastUpdated, url, imgUrl, isSaved);
 		return manga;
 	}
 	
@@ -89,6 +88,7 @@ public class GeneralHelper {
 		// Define a projection that specifies which columns from the database
 		// you will actually use after this query.
 		String[] projection = {
+				MangaList.COLUMN_NAME_MANGA_ID,
 				MangaList.COLUMN_NAME_TITLE,
 				MangaList.COLUMN_NAME_AUTHOR,
 				MangaList.COLUMN_NAME_URL,
@@ -120,5 +120,22 @@ public class GeneralHelper {
 				return manga;
 		}
 		return null;
+	}
+	
+	/**
+	 * Getting index of given manga in the given manga list
+	 * @param checkedManga
+	 * @param mangaList
+	 * @return int index of the manga
+	 * @throws IllegalArgumentException
+	 */
+	public static int getIndex(Manga checkedManga, ArrayList<Manga> mangaList) throws IllegalArgumentException{
+		int retval = 0;
+		for(Manga manga : mangaList) {
+			if(manga.id == checkedManga.id)
+				return retval;
+			retval++;
+		}
+		throw new IllegalArgumentException();
 	}
 }

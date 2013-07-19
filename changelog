@@ -17,9 +17,19 @@
 - Add unsave button and function
 -Refactor
 
+07/18/2013
+- Fix setIndexer bug
+- Fix database of new chapter not there
+- Auto select first item when typing to filter
+- Refactor 'unsave' function
+
+
 Next Planning
-- Browse New Manga -
-	- Refactor 'unsave' function
+- Browse New Manga
+	- Keep Last chapter after refresh list
+	- Make sure last read is saved to database
+		-Keep the last read if unsaved, but don't show it
+	- Refresh list doesn't need to parse detail
 	- Check img url to get image
 	- Add functionalities to other buttons
 	

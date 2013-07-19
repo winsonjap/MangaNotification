@@ -4,7 +4,6 @@ import helper.GeneralHelper;
 import helper.OnlineParseOne;
 import helper.OnlineParser;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -12,13 +11,9 @@ import model.AZAdapter;
 import model.FunctorsInterface;
 import model.Manga;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import sql.MangaListAccesser;
 import sql.MangaListTable.MangaList;
+import sql.SaveDatabaseTask;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -27,7 +22,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -41,8 +35,17 @@ import android.widget.ListView;
 import com.example.manganotification.R;
 
 @SuppressLint("NewApi")
+/**
+ * The activity class for Browse New Button
+ * which is the activity showing list of all manga list parsed online
+ * Differentiate between saved and unsaved mangas
+ * User can save manga in this page
+ * Ability to filter the listview
+ * @author winson
+ *
+ */
 public class BrowseNewActivity extends Activity {
-	private ListView listView;
+	public ListView listView;
 	private ArrayList<Manga> mangaList;
 	private EditText inputSearch;
 	private AZAdapter<String> azadapter;
@@ -60,6 +63,7 @@ public class BrowseNewActivity extends Activity {
 		
 		mangaList = new ArrayList<Manga>();
 		mangaList = getFromDatabase();
+		Collections.sort(mangaList);
 		setContentView(R.layout.activity_browse_new);
 		handleInputSearch();
 		listView = (ListView) findViewById(R.id.mangaListView);
@@ -80,24 +84,12 @@ public class BrowseNewActivity extends Activity {
 						
 						@Override
 						public void positiveAction() {
-							if(manga.isSaved==1) {
-								int index = getIndex(manga);
-								manga.isSaved = 0;
-								manga.newestChapter = "";
-								manga.lastUpdated = "";
-								manga.readChapter = "";
-								setSaved(manga, 0);
-								mangaList.set(index, manga);
-								azadapter.clear();
-								azadapter.addAll(mangaList);
-								azadapter.origMangaList = mangaList;
-								azadapter.notifyDataSetChanged();
-								azadapter.setIndexer();
-							}
-							else {
+							if(manga.isSaved==1)
+								unsaveManga(this.manga);
+							else
 								refreshMangaDetail(this.manga);
-							}
 						}
+
 						@Override
 						public void negativeAction() {
 							System.out.println("CANCEL");
@@ -109,8 +101,8 @@ public class BrowseNewActivity extends Activity {
 						message = "Unfollowing this Manga?";
 						save = "UnSave!!";
 					}
-//					message += manga.isSaved + " - ";
-//					message += manga.newestChapter + " - " + manga.readChapter + " -";
+					message += manga.isSaved + " - ";
+					message += manga.newestChapter + " - " + manga.readChapter + " -";
 					AlertDialog.Builder dialog = GeneralHelper.buildDialog(message, save, 
 							getString(R.string.cancel_string), currContext, new SaveAction(manga), true);
 					dialog.show();
@@ -120,12 +112,17 @@ public class BrowseNewActivity extends Activity {
 		listView.setAdapter(azadapter);
 	}
 
+	/**
+	 * Function to get all mangas from database to populate listview
+	 * @return ArrayList<Manga>
+	 */
 	private ArrayList<Manga> getFromDatabase() {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		ArrayList<Manga> retList = new ArrayList<Manga>();
 		// Define a projection that specifies which columns from the database
 		// you will actually use after this query.
 		String[] projection = {
+				MangaList.COLUMN_NAME_MANGA_ID,
 				MangaList.COLUMN_NAME_TITLE,
 				MangaList.COLUMN_NAME_AUTHOR,
 				MangaList.COLUMN_NAME_URL,
@@ -148,62 +145,83 @@ public class BrowseNewActivity extends Activity {
 				);
 		int position = 0;
 		while(c.moveToPosition(position)) {
-			retList.add(GeneralHelper.getData(c));
+			Manga addedManga = GeneralHelper.getData(c);
+			retList.add(addedManga);
+			System.out.println("ID : " + addedManga.id);
+			System.out.println("TIT : " + addedManga.title);
 			position++;
 		}
 		return retList;
 	}
 	
+	/**
+	 * Set the given manga's save status to newVal
+	 * IT will automatically save the detail of the manga when saved
+	 * @param manga - manga that will be saved/unsaved
+	 * @param newVal - value to determine whether to save/unsave
+	 */
 	private void setSaved(Manga manga, int newVal) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-		String title = manga.title;
-		String url = manga.url;
 		// New value for one column
 		ContentValues values = new ContentValues();
 		values.put(MangaList.COLUMN_NAME_IS_SAVED, newVal);
-		if(GeneralHelper.isEmptyStringChecker(manga.readChapter))
-			values.put(MangaList.COLUMN_NAME_READ_CHAPTER, "0");
-
+		if(newVal==1) {
+			if(GeneralHelper.isEmptyStringChecker(manga.readChapter))
+				values.put(MangaList.COLUMN_NAME_READ_CHAPTER, "0");
+			else
+				values.put(MangaList.COLUMN_NAME_READ_CHAPTER, manga.readChapter);
+			values.put(MangaList.COLUMN_NAME_LAST_CHAPTER, manga.newestChapter);
+			values.put(MangaList.COLUMN_NAME_LAST_UPDATED, manga.lastUpdated);
+			values.put(MangaList.COLUMN_NAME_AUTHOR, manga.author);
+			values.put(MangaList.COLUMN_NAME_TITLE, manga.title);
+			values.put(MangaList.COLUMN_NAME_URL, manga.url);
+			values.put(MangaList.COLUMN_NAME_IMG_URL, manga.imgUrl);
+		}
 		// Which row to update, based on the ID
-		String selection = MangaList.COLUMN_NAME_TITLE + " =?";
-		selection += " and ";
-		selection += MangaList.COLUMN_NAME_URL + " =?";
-		String[] selectionArgs = { title, url };
-
-		db.update(
-		    MangaList.TABLE_NAME,
-		    values,
-		    selection,
-		    selectionArgs);
+		db.update(MangaList.TABLE_NAME,values,
+				  MangaList.COLUMN_NAME_MANGA_ID+"="+manga.id,null);
 	}
 	
+	/**
+	 * Function to unsave a saved manga
+	 * @param manga - manga to be unsaved
+	 */
+	private void unsaveManga(Manga manga) {
+		int index = GeneralHelper.getIndex(manga, mangaList);
+		manga.isSaved = 0;
+		setSaved(manga, 0);
+		mangaList.set(index, manga);
+		azadapter.origMangaList = mangaList;
+		azadapter.setIndexer();
+		azadapter.notifyDataSetChanged();							
+	}
+	
+	/**
+	 * Refresh a manga, populating it's detail (author,chapter,etc)
+	 * Trigger is when manga being saved -> it will also save manga to
+	 * database by calling setSave()
+	 * @param manga - manga to be populated
+	 */
 	private void refreshMangaDetail(Manga manga) {
 		try {
-			int index = getIndex(manga);
+			int index = GeneralHelper.getIndex(manga, mangaList);
 			manga = this.parseDetailContent(manga);
 			manga.isSaved = 1;
 			mangaList.set(index,manga);
-			setSaved(manga,1);
-			azadapter.clear();
-			azadapter.addAll(mangaList);
+			setSaved(manga,1);	
 			azadapter.origMangaList = mangaList;
-			azadapter.notifyDataSetChanged();
 			azadapter.setIndexer();
+			azadapter.notifyDataSetChanged();
 		} catch(IllegalArgumentException e) {
 			System.out.println("Error getting manga detail");
 		}
 	}
-	
-	private int getIndex(Manga checkedManga) throws IllegalArgumentException{
-		int retval = 0;
-		for(Manga manga : mangaList) {
-			if(manga.url.equals(checkedManga.url))
-				return retval;
-			retval++;
-		}
-		throw new IllegalArgumentException();
-	}
 
+	/**
+	 * Function to parse detail of a manga
+	 * @param manga - manga to be populated with detail
+	 * @return manga - parsed with detail
+	 */
 	private Manga parseDetailContent(Manga manga) {
 		OnlineParseOne oneParser = new OnlineParseOne(mDbHelper, manga);
 		try {
@@ -214,6 +232,10 @@ public class BrowseNewActivity extends Activity {
 		return oneParser.manga;
 	}
 
+	/**
+	 * Refresh the whole list of listview
+	 * It will save to the database as well
+	 */
 	@SuppressWarnings("unchecked")
 	private void refreshMangaList() {
 		mangaList = this.parseMangaOnline();
@@ -221,25 +243,37 @@ public class BrowseNewActivity extends Activity {
 		this.saveListToDatabase(mangaList);
 		azadapter.clear();
 		azadapter.addAll(mangaList);
-		azadapter.notifyDataSetChanged();
+		azadapter.origMangaList = mangaList;
 		azadapter.setIndexer();
+		azadapter.notifyDataSetChanged();
 	}
 
+	/**
+	 * Function to save the given list to the database
+	 * @param mangaList - list to be saved
+	 */
 	private void saveListToDatabase(ArrayList<Manga> mangaList) {
-		SaveDatabaseTask saveTask = new SaveDatabaseTask();
+		SaveDatabaseTask saveTask = new SaveDatabaseTask(mDbHelper,mangaList);
 		try {
 			saveTask.execute("").get();
+			mangaList = saveTask.mangaList;
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * The function to handle filter
+	 * It will affected every time user type
+	 * in the filter search textbox
+	 */
 	private void handleInputSearch() {
 		inputSearch = (EditText) findViewById(R.id.inputBox);
 		inputSearch.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
 				BrowseNewActivity.this.azadapter.getFilter().filter(cs);
+				listView.setSelection(0);
 			}
 			@Override
 			public void afterTextChanged(Editable arg0) {}
@@ -247,42 +281,6 @@ public class BrowseNewActivity extends Activity {
 			public void beforeTextChanged(CharSequence arg0, int arg1,
 					int arg2, int arg3) {}
 		});
-	}
-	
-	private class SaveDatabaseTask extends AsyncTask<String, Void, String> {
-		private SQLiteDatabase db;
-		
-		public SaveDatabaseTask() {
-			this.db = mDbHelper.getWritableDatabase();
-		}
-		
-		@Override
-		protected String doInBackground(String... arg0) {
-			mDbHelper.onUpgrade(db,0,0);
-			db.beginTransaction();
-			for(Manga manga : mangaList) {
-				saveMangaToDatabase(manga);
-			}
-			db.setTransactionSuccessful();
-			db.endTransaction();
-			return null;
-		}
-		
-		public void saveMangaToDatabase(Manga manga) {
-			ContentValues values = new ContentValues();
-			values.put(MangaList.COLUMN_NAME_TITLE, manga.title);
-			values.put(MangaList.COLUMN_NAME_AUTHOR, manga.author);
-			values.put(MangaList.COLUMN_NAME_URL, manga.url);
-			values.put(MangaList.COLUMN_NAME_LAST_CHAPTER, manga.newestChapter);
-			values.put(MangaList.COLUMN_NAME_LAST_UPDATED, manga.lastUpdated);
-			values.put(MangaList.COLUMN_NAME_IMG_URL, manga.imgUrl);
-			values.put(MangaList.COLUMN_NAME_READ_CHAPTER, manga.readChapter);
-			values.put(MangaList.COLUMN_NAME_IS_SAVED, manga.isSaved);
-
-			db.insert(MangaList.TABLE_NAME,
-					  null,
-					  values);
-		}
 	}
 
 	private ArrayList<Manga> parseMangaOnline() {
