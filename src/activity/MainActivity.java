@@ -30,15 +30,7 @@ public class MainActivity extends Activity {
     }
     
     public void browseExist(View view) {
-
+    	Intent intent = new Intent(this, SavedListActivity.class);
+    	startActivity(intent);
     }
-    
-    public void findNew(View view) {
-    	
-    }
-    
-    public void findExist(View view) {
-    	
-    }
-    
 }

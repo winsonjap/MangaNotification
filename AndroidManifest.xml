@@ -22,10 +22,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="activity.BrowseNewActivity" android:theme="@style/customTheme"
-                  android:label="@string/title_activity_browse_new">  
+        <activity
+            android:name="activity.BrowseNewActivity"
+            android:label="@string/title_activity_browse_new"
+            android:theme="@style/customTheme" >
+        </activity>
+        <activity
+            android:name="activity.SavedListActivity"
+            android:label="@string/title_activity_saved_list"
+            android:theme="@style/customTheme" >
         </activity>
     </application>
-    
-	<uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
 </manifest>

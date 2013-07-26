@@ -2,6 +2,7 @@ package helper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import model.Manga;
 
@@ -32,6 +33,8 @@ public class OnlineParser extends AsyncTask<String, Void, String> {
 		try {
 			Document doc = Jsoup.connect("http://www.mangareader.net/alphabetical").get();
 			Elements mangaListOnline = doc.getElementsByClass("series_col");
+			ArrayList<Manga> mangaList = GeneralHelper.getFromDatabase(mDbHelper, false);
+			HashMap<String, Manga> mangaHash = GeneralHelper.convertToHash(mangaList);
 			for(Element list : mangaListOnline) {
 				Elements linkList = list.getElementsByTag("li");
 				for(Element listTag : linkList) {
@@ -42,15 +45,18 @@ public class OnlineParser extends AsyncTask<String, Void, String> {
 						continue;
 					String mangaTitle = GeneralHelper.capitalize(link.text());
 					System.out.println("PARSING :" + mangaTitle);
-					Manga savedManga = GeneralHelper.getSavedMangaData(mangaTitle, mangaUrl, mDbHelper);
+					Manga savedManga = null;
+					if(mangaHash.containsKey(mangaUrl))
+						savedManga = mangaHash.get(mangaUrl);
+					//Manga savedManga = GeneralHelper.getSavedMangaData(db, mangaTitle, mangaUrl, mDbHelper);
 					Manga manga;
 					if(savedManga != null) {
-						if(savedManga.isSaved == 1) {
-							OnlineParseOne oneParser = new OnlineParseOne(mDbHelper, savedManga);
-							oneParser.parseMangaDetail();
-							manga = oneParser.manga;
-						}
-						else
+//						if(savedManga.isSaved == 1) {
+//							OnlineParseOne oneParser = new OnlineParseOne(mDbHelper, savedManga);
+//							oneParser.parseMangaDetail();
+//							manga = oneParser.manga;
+//						}
+//						else
 							manga = savedManga;
 						manga.id = -1;
 					}

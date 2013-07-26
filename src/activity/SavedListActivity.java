@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Editable;
@@ -43,7 +44,7 @@ import com.example.manganotification.R;
  * @author winson
  *
  */
-public class BrowseNewActivity extends Activity {
+public class SavedListActivity extends Activity {
 	public ListView listView;
 	private ArrayList<Manga> mangaList;
 	private EditText inputSearch;
@@ -61,9 +62,9 @@ public class BrowseNewActivity extends Activity {
 		//mDbHelper.onUpgrade(mDbHelper.getWritableDatabase(),0,0);
 		
 		mangaList = new ArrayList<Manga>();
-		mangaList = GeneralHelper.getFromDatabase(mDbHelper, false);
+		mangaList = GeneralHelper.getFromDatabase(mDbHelper,true);
 		Collections.sort(mangaList);
-		setContentView(R.layout.activity_browse_new);
+		setContentView(R.layout.activity_saved_list);
 		handleInputSearch();
 		listView = (ListView) findViewById(R.id.mangaListView);
 		listView.setFastScrollEnabled(true);

@@ -15,19 +15,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_find_new"
-        android:textColor="@color/white"
-        android:onClick="findNew" />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:text="@string/button_browse_exist"
         android:textColor="@color/white"
         android:onClick="browseExist" />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_find_exist"
-        android:textColor="@color/white"
-        android:onClick="findExist" />
 </LinearLayout>

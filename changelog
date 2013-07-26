@@ -23,13 +23,22 @@
 - Auto select first item when typing to filter
 - Refactor 'unsave' function
 
+07/25/2013
+- Keep Last chapter after refresh list
+- Make sure last read is saved to database
+	-Keep the last read if unsaved, but don't show it
+- Refresh list doesn't need to parse detail
+- Make 'saved list' button works
+- Showing only saved manga
 
 Next Planning
 - Browse New Manga
-	- Keep Last chapter after refresh list
-	- Make sure last read is saved to database
-		-Keep the last read if unsaved, but don't show it
-	- Refresh list doesn't need to parse detail
 	- Check img url to get image
 	- Add functionalities to other buttons
-	
+- Browse Saved Manga
+	- Make detail page
+	- Link detail page to click, remove 
+		save/unsave ability from click list
+	- Able to unsave manga
+	- Able to check read manga
+	- Able to check all read manga

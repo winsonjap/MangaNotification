@@ -13,11 +13,11 @@
     <string name="save_string">Save this manga</string>
     <string name="cancel_string">Cancel</string>
     <string name="confirm_string">Okay!</string>
-    
-    
+
     <color name="black">#000000</color>
     <color name="white">#fff</color>
 
     <string name="title_activity_browse_new">Browse Manga Online</string>
+    <string name="title_activity_saved_list">Browse Saved Manga</string>
 
 </resources>

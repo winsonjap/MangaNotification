@@ -1,6 +1,7 @@
 package helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import model.FunctorsInterface;
 import model.Manga;
@@ -83,8 +84,13 @@ public class GeneralHelper {
 		return manga;
 	}
 	
-	public static Manga getSavedMangaData(String title, String url, MangaListAccesser mDbHelper) {
+	/**
+	 * Function to get all mangas from database to populate listview
+	 * @return ArrayList<Manga>
+	 */
+	public static ArrayList<Manga> getFromDatabase(MangaListAccesser mDbHelper, boolean saveOnly) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		ArrayList<Manga> retList = new ArrayList<Manga>();
 		// Define a projection that specifies which columns from the database
 		// you will actually use after this query.
 		String[] projection = {
@@ -98,28 +104,32 @@ public class GeneralHelper {
 				MangaList.COLUMN_NAME_IMG_URL,
 				MangaList.COLUMN_NAME_IS_SAVED
 		};
-		String selection = MangaList.COLUMN_NAME_TITLE + "=?";
-		selection += " and ";
-		selection += MangaList.COLUMN_NAME_URL + "=?";
-		
-		String[] selectionArgs = {title, url};
 		// How you want the results sorted in the resulting Cursor
 		String sortOrder = MangaList.COLUMN_NAME_TITLE + " ASC";
 		Cursor c = db.query(
 				MangaList.TABLE_NAME,  // The table to query
 				projection,            // The columns to return
-				selection,         	   // The columns for the WHERE clause
-				selectionArgs, 	       // The values for the WHERE clause
+				null,           	   // The columns for the WHERE clause
+				null,     		       // The values for the WHERE clause
 				null,                  // don't group the rows
 				null,                  // don't filter by row groups
 				sortOrder              // The sort order
-		);
-		if(c.moveToFirst()) {
-			Manga manga = GeneralHelper.getData(c);
-			if(manga.isSaved == 1)
-				return manga;
+				);
+		int position = 0;
+		while(c.moveToPosition(position)) {
+			Manga addedManga = GeneralHelper.getData(c);
+			if(saveOnly) {
+				if(addedManga.isSaved == 1)
+					retList.add(addedManga);
+			}
+			else
+				retList.add(addedManga);
+
+			//System.out.println("ID : " + addedManga.id);
+			//System.out.println("TIT : " + addedManga.title);
+			position++;
 		}
-		return null;
+		return retList;
 	}
 	
 	/**
@@ -137,5 +147,14 @@ public class GeneralHelper {
 			retval++;
 		}
 		throw new IllegalArgumentException();
+	}
+
+	public static HashMap<String, Manga> convertToHash(
+			ArrayList<Manga> mangaList) {
+		HashMap<String, Manga> hashedList = new HashMap<String, Manga>();
+		for(Manga manga : mangaList) {
+			hashedList.put(manga.url, manga);
+		}
+		return hashedList;
 	}
 }
