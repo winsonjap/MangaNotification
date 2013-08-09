@@ -29,6 +29,4 @@ Manga is a japanese version of comic book.
 That's all.
 
 ## Log
-As per 2013/08/08 it's the alpha release I guess. It can handle
-
-some basic functionalities for keeping track your record.
+As per 2013/08/08 it's the alpha release I guess. It can handle some basic functionalities for keeping track your record.
