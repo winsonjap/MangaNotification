@@ -42,8 +42,10 @@ public class OnlineParseOne extends AsyncTask<String, Void, String> {
 			manga.imgUrl = this.getImgUrlTag(detailDoc);
 			manga.lastUpdated = this.getLastUpdatedDate(detailDoc);
 		} catch (IOException e) {
-			System.err.println("We're having some trouble connecting to the server");
-			System.err.println("Sorry for the inconvenience, please try again later!");
+			manga = null;
+			String errMsg = "We're having some trouble connecting to the server\n";
+			errMsg += "Sorry for the inconvenience, please try again later!";
+			System.out.println(errMsg);
 		}
 	}
 
@@ -65,25 +67,12 @@ public class OnlineParseOne extends AsyncTask<String, Void, String> {
 		String text = link.text();
 		text = text.replaceAll(Pattern.quote(manga.title+" "), "");
 		return text;
-		//		System.out.println("CURR : " + manga.title);
-		//		Element detailElements = detailDoc.getElementById("listing");
-		//		Elements trList = detailElements.getElementsByAttribute("tr");
-		//		Element lastChap = trList.last();
-		//		Elements tdList = lastChap.getElementsByAttribute("td");
-		//		Element lastChapNum = tdList.first();
-		//		String text = lastChapNum.text();
-		//		text = text.replaceAll(manga.title +" ", "");
-		//		return text;
 	}
 
 	private String getLastUpdatedDate(Document detailDoc) {
 		Element detailElements = detailDoc.getElementById("chapterlist");
 		Elements trList = detailElements.getElementsByTag("td");
 		Element lastChap = trList.last();
-		//Elements tdList = lastChap.getElementsByAttribute("td");
-		//if(tdList.size() < 2)
-		//	return "-1";
-		//Element dateTd = tdList.last();
 		return lastChap.text();
 	}
 
@@ -95,8 +84,6 @@ public class OnlineParseOne extends AsyncTask<String, Void, String> {
 			Elements tdList = eachProp.getElementsByTag("td");
 			String prop = tdList.first().text();
 			String val = tdList.last().text();
-			System.out.println("PROP : " + prop);
-			System.out.println("VAL : " + val);
 			if(prop.equals("Author:")) {
 				authors += val;
 			}

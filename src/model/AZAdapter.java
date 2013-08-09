@@ -133,13 +133,14 @@ public class AZAdapter<T> extends ArrayAdapter<Manga> implements SectionIndexer,
 
 		title.setText(manga.title);
 		author.setText(manga.author);
-		if(manga.isSaved==1 && manga.readChapter!=manga.newestChapter) {
+		if(manga.isSaved==1 && !manga.readChapter.equals(manga.newestChapter)) {
 			if(GeneralHelper.isEmptyStringChecker(manga.readChapter))
 				manga.readChapter = "0";
 			read_chapter.setText("Last Read : " + manga.readChapter);
 		}
 		else
 			read_chapter.setText("");
+		
 		if(!GeneralHelper.isEmptyStringChecker(manga.newestChapter))
 			last_chapter.setText("Last Chapter : " + manga.newestChapter);
 		else

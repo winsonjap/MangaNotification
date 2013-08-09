@@ -31,10 +31,17 @@
 - Make 'saved list' button works
 - Showing only saved manga
 
+08/08/2013
+- Read function done
+- Fix refresh all in saved list
+- Refresh detail for each manga
+- Add first time user dialog
+- Only refreshing saved list
+- Lost Connection error message
+
 Next Planning
 - Browse New Manga
 	- Check img url to get image
-	- Add functionalities to other buttons
 - Browse Saved Manga
 	- Make detail page
 	- Link detail page to click, remove 

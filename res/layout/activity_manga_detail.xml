@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/list_selector"
+    android:orientation="horizontal"
+    android:padding="5dip" >
+ 
+    <!--  ListRow Left sied Thumbnail image -->
+    <LinearLayout android:id="@+id/thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"> 
+        <ImageView
+            android:id="@+id/manga_image"
+            android:layout_width="50dip"
+            android:layout_height="50dip" />
+ 
+    </LinearLayout>
+ 
+    <LinearLayout android:id="@+id/content"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+      <!-- Title Of Manga-->
+	    <TextView
+	        android:id="@+id/manga_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:inputType="none"
+	        android:textIsSelectable="false"
+			android:editable="false"
+	        android:text="Law of Ueki"
+	        android:textColor="#040404"
+	        android:typeface="sans"
+	        android:textSize="15dip"
+	        android:textStyle="bold"/>
+	 
+	    <!-- Author Name -->
+	    <TextView
+	        android:id="@+id/manga_author"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:inputType="none"
+	        android:textIsSelectable="false"
+			android:editable="false"
+	        android:layout_below="@id/manga_title"
+	        android:textColor="#343434"
+	        android:textSize="10dip"
+	        android:layout_marginTop="1dip"
+	        android:text="Fujiko F Fujio" />
+	 
+	    <!-- Latest Chapter -->
+	    <TextView
+	        android:id="@+id/manga_last_chapter"
+	        android:layout_width="wrap_content"
+	        android:inputType="none"
+	        android:textIsSelectable="false"
+	        android:layout_toRightOf="@+id/thumbnail"
+	        android:layout_below="@id/manga_author"
+	        android:layout_marginTop="0.5dip"
+			android:editable="false"
+	        android:layout_height="wrap_content"
+	        android:text=""
+	        android:textSize="10dip"
+	        android:textColor="#10bcc9"
+	        android:textStyle="bold"/>
+	    <!-- Read Chapter -->
+	    <TextView
+	        android:id="@+id/manga_read_chapter"
+	        android:layout_width="wrap_content"
+	        android:inputType="none"
+	        android:textIsSelectable="false"
+	        android:layout_toRightOf="@+id/thumbnail"
+	        android:layout_below="@id/manga_last_chapter"
+	        android:layout_marginTop="0.5dip"
+			android:editable="false"
+	        android:layout_height="wrap_content"
+	        android:text=""
+	        android:textSize="10dip"
+	        android:textColor="#FF0000"
+	        android:textStyle="bold"/>      
+    </LinearLayout>
+</RelativeLayout>

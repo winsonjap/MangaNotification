@@ -21,7 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 public class GeneralHelper {
 	public static AlertDialog.Builder buildDialog(String msg, String pos, 
 							String neg, Context ctx, final FunctorsInterface functor,
-							boolean cancelable) {
+							boolean cancelable, String neutral) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         builder.setMessage(msg)
@@ -36,6 +36,13 @@ public class GeneralHelper {
                 	   functor.negativeAction();
                    }
                });
+        if(!isEmptyStringChecker(neutral)) {
+        	builder.setNeutralButton(neutral, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+             	   functor.neutralAction();
+                }
+            });
+        }
         return builder;
     }
 	
@@ -49,9 +56,13 @@ public class GeneralHelper {
 			public void negativeAction() {
 				System.out.println("CANCEL");
 			}
+			@Override
+			public void neutralAction() {
+				
+			}
 		}
 		AlertDialog.Builder dialog = GeneralHelper.buildDialog(errMsg, context.getString(R.string.confirm_string), 
-				"", context, new ConfirmNothing(), false);
+				"", context, new ConfirmNothing(), false, "");
 		return dialog;
 	}
 	

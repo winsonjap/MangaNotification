@@ -62,6 +62,13 @@ public class BrowseNewActivity extends Activity {
 		
 		mangaList = new ArrayList<Manga>();
 		mangaList = GeneralHelper.getFromDatabase(mDbHelper, false);
+		if(mangaList.size()==0) {
+			String message = "Uh-Oh, it seems that you don't have any manga listed yet";
+			message += "\nNo worries! Start by clicking refresh button on top right corner of the page";
+			message += "\nIt might take a while and require internet connection to refresh";
+			AlertDialog.Builder dialog = GeneralHelper.buildErrorDialog(message, this);
+			dialog.show();
+		}
 		Collections.sort(mangaList);
 		setContentView(R.layout.activity_browse_new);
 		handleInputSearch();
@@ -93,6 +100,10 @@ public class BrowseNewActivity extends Activity {
 						public void negativeAction() {
 							System.out.println("CANCEL");
 						}
+
+						@Override
+						public void neutralAction() {
+						}
 					}
 					String message = "Save this Manga?";
 					String save = getString(R.string.save_string);
@@ -103,7 +114,7 @@ public class BrowseNewActivity extends Activity {
 					//message += manga.isSaved + " - ";
 					//message += manga.newestChapter + " - " + manga.readChapter + " -";
 					AlertDialog.Builder dialog = GeneralHelper.buildDialog(message, save, 
-							getString(R.string.cancel_string), currContext, new SaveAction(manga), true);
+							getString(R.string.cancel_string), currContext, new SaveAction(manga), true,"");
 					dialog.show();
 				}
 			} 
@@ -162,6 +173,13 @@ public class BrowseNewActivity extends Activity {
 		try {
 			int index = GeneralHelper.getIndex(manga, mangaList);
 			manga = this.parseDetailContent(manga);
+			if(manga == null) {
+				String errMsg = "We're having some trouble connecting to the server\n";
+				errMsg += "The troublemaker is 'most' probably the internet connection";
+				AlertDialog.Builder dialog = GeneralHelper.buildErrorDialog(errMsg,this);
+				dialog.show();
+				return;
+			}
 			manga.isSaved = 1;
 			mangaList.set(index,manga);
 			setSaved(manga,1);	
@@ -195,6 +213,13 @@ public class BrowseNewActivity extends Activity {
 	@SuppressWarnings("unchecked")
 	private void refreshMangaList() {
 		mangaList = this.parseMangaOnline();
+		if(mangaList.size() == 0) {
+			String errMsg = "We're having some trouble connecting to the server\n";
+			errMsg += "The troublemaker is 'most' probably the internet connection";
+			AlertDialog.Builder dialog = GeneralHelper.buildErrorDialog(errMsg,this);
+			dialog.show();
+			return;
+		}
 		Collections.sort(mangaList);
 		this.saveListToDatabase(mangaList);
 		azadapter.clear();
@@ -240,7 +265,7 @@ public class BrowseNewActivity extends Activity {
 	}
 
 	private ArrayList<Manga> parseMangaOnline() {
-		OnlineParser parserTask = new OnlineParser(mDbHelper, this);
+		OnlineParser parserTask = new OnlineParser(mDbHelper, mangaList);
 		try {
 			parserTask.execute("").get();
 		} catch(Exception e) {
@@ -261,9 +286,12 @@ public class BrowseNewActivity extends Activity {
 			public void negativeAction() {
 				System.out.println("CANCEL");
 			}
+			@Override
+			public void neutralAction() {				
+			}
 		}
 		AlertDialog.Builder dialog = GeneralHelper.buildDialog(message, getString(R.string.continue_string), 
-				getString(R.string.cancel_string), this, new RefreshAction(), true);
+				getString(R.string.cancel_string), this, new RefreshAction(), true,"");
 		dialog.show();
 	}
 

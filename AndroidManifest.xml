@@ -32,6 +32,10 @@
             android:label="@string/title_activity_saved_list"
             android:theme="@style/customTheme" >
         </activity>
+        <activity
+            android:name="activity.MangaDetail"
+            android:label="@string/title_activity_manga_detail" >
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

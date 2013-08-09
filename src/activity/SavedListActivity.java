@@ -2,9 +2,9 @@ package activity;
 
 import helper.GeneralHelper;
 import helper.OnlineParseOne;
-import helper.OnlineParser;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 import model.AZAdapter;
@@ -13,14 +13,12 @@ import model.Manga;
 
 import sql.MangaListAccesser;
 import sql.MangaListTable.MangaList;
-import sql.SaveDatabaseTask;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Editable;
@@ -76,35 +74,34 @@ public class SavedListActivity extends Activity {
 			public void onItemClick(AdapterView<?> adapter, View view, int position, long arg) {
 				Manga manga = (Manga) azadapter.mangaList.get(position);
 				if(manga.title!="") {
-					class SaveAction implements FunctorsInterface {
+					class ReadAction implements FunctorsInterface {
 						private Manga manga;
-						public SaveAction(Manga manga) {
+						public ReadAction(Manga manga) {
 							this.manga = manga;
 						}
 						
 						@Override
 						public void positiveAction() {
-							if(manga.isSaved==1)
-								unsaveManga(this.manga);
-							else
-								refreshMangaDetail(this.manga);
+							readManga(manga);
 						}
 
 						@Override
 						public void negativeAction() {
 							System.out.println("CANCEL");
 						}
+
+						@Override
+						public void neutralAction() {
+							refreshMangaDetail(manga);
+						}
 					}
-					String message = "Save this Manga?";
-					String save = getString(R.string.save_string);
-					if(manga.isSaved==1) {
-						message = "Unfollowing this Manga?";
-						save = "UnSave :'(";
-					}
+					String message = "Action to do:";
+					String read = getString(R.string.read_string);
+					String refresh = getString(R.string.refresh_string);
 					//message += manga.isSaved + " - ";
 					//message += manga.newestChapter + " - " + manga.readChapter + " -";
-					AlertDialog.Builder dialog = GeneralHelper.buildDialog(message, save, 
-							getString(R.string.cancel_string), currContext, new SaveAction(manga), true);
+					AlertDialog.Builder dialog = GeneralHelper.buildDialog(message, read, 
+							getString(R.string.cancel_string), currContext, new ReadAction(manga), true, refresh);
 					dialog.show();
 				}
 			} 
@@ -143,10 +140,10 @@ public class SavedListActivity extends Activity {
 	 * Function to unsave a saved manga
 	 * @param manga - manga to be unsaved
 	 */
-	private void unsaveManga(Manga manga) {
+	private void readManga(Manga manga) {
 		int index = GeneralHelper.getIndex(manga, mangaList);
-		manga.isSaved = 0;
-		setSaved(manga, 0);
+		manga.readChapter = manga.newestChapter;
+		setSaved(manga, 1);
 		mangaList.set(index, manga);
 		azadapter.origMangaList = mangaList;
 		azadapter.setIndexer();
@@ -163,7 +160,19 @@ public class SavedListActivity extends Activity {
 		try {
 			int index = GeneralHelper.getIndex(manga, mangaList);
 			manga = this.parseDetailContent(manga);
+			if(manga == null) {
+				String errMsg = "We're having some trouble connecting to the server\n";
+				errMsg += "The troublemaker is 'most' probably the internet connection";
+				AlertDialog.Builder dialog = GeneralHelper.buildErrorDialog(errMsg,this);
+				dialog.show();
+				return;
+			}
 			manga.isSaved = 1;
+			Calendar c = Calendar.getInstance();
+			String year = Integer.toString(c.get(Calendar.YEAR));
+			String month = Integer.toString(c.get(Calendar.MONTH));
+			String day = Integer.toString(c.get(Calendar.DATE));
+			manga.lastUpdated = year +"/"+month+"/"+day;
 			mangaList.set(index,manga);
 			setSaved(manga,1);	
 			azadapter.origMangaList = mangaList;
@@ -193,30 +202,11 @@ public class SavedListActivity extends Activity {
 	 * Refresh the whole list of listview
 	 * It will save to the database as well
 	 */
-	@SuppressWarnings("unchecked")
 	private void refreshMangaList() {
-		mangaList = this.parseMangaOnline();
-		Collections.sort(mangaList);
-		this.saveListToDatabase(mangaList);
-		azadapter.clear();
-		azadapter.addAll(mangaList);
-		azadapter.origMangaList = mangaList;
-		azadapter.setIndexer();
-		azadapter.notifyDataSetChanged();
-	}
-
-	/**
-	 * Function to save the given list to the database
-	 * @param mangaList - list to be saved
-	 */
-	private void saveListToDatabase(ArrayList<Manga> mangaList) {
-		SaveDatabaseTask saveTask = new SaveDatabaseTask(mDbHelper,mangaList);
-		try {
-			saveTask.execute("").get();
-			mangaList = saveTask.mangaList;
-		} catch(Exception e) {
-			e.printStackTrace();
+		for(Manga manga : mangaList) {
+			refreshMangaDetail(manga);
 		}
+		azadapter.notifyDataSetChanged();
 	}
 
 	/**
@@ -240,16 +230,6 @@ public class SavedListActivity extends Activity {
 		});
 	}
 
-	private ArrayList<Manga> parseMangaOnline() {
-		OnlineParser parserTask = new OnlineParser(mDbHelper, this);
-		try {
-			parserTask.execute("").get();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return parserTask.mangaListParsed;
-	}
-
 	public void refreshList(View view) {
 		String message = "This will refresh the list \n" +
 				 "It may take a minute or so depending on your internet connection";
@@ -262,9 +242,12 @@ public class SavedListActivity extends Activity {
 			public void negativeAction() {
 				System.out.println("CANCEL");
 			}
+			@Override
+			public void neutralAction() {
+			}
 		}
 		AlertDialog.Builder dialog = GeneralHelper.buildDialog(message, getString(R.string.continue_string), 
-				getString(R.string.cancel_string), this, new RefreshAction(), true);
+				getString(R.string.cancel_string), this, new RefreshAction(), true, "");
 		dialog.show();
 	}
 

@@ -1,6 +1,5 @@
 package helper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,22 +12,20 @@ import org.jsoup.select.Elements;
 
 import sql.MangaListAccesser;
 
-import android.app.AlertDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 
 public class OnlineParser extends AsyncTask<String, Void, String> {
 	public ArrayList<Manga> mangaListParsed;
+	public ArrayList<Manga> mangaList;
 	public MangaListAccesser mDbHelper;
-	public Context context;
 	
-	public OnlineParser(MangaListAccesser mDbHelper, Context context) {
+	public OnlineParser(MangaListAccesser mDbHelper, ArrayList<Manga> mangaList) {
 		this.mDbHelper = mDbHelper;
-		this.context = context;
+		this.mangaList = mangaList;
 	}
 	
 	@Override
-	protected String doInBackground(String... arg0) {
+	protected String doInBackground(String... arg0){
 		mangaListParsed = new ArrayList<Manga>();
 		try {
 			Document doc = Jsoup.connect("http://www.mangareader.net/alphabetical").get();
@@ -65,11 +62,11 @@ public class OnlineParser extends AsyncTask<String, Void, String> {
 					mangaListParsed.add(manga);
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
+			mangaListParsed = new ArrayList<Manga>();
 			String errMsg = "We're having some trouble connecting to the server\n";
 			errMsg += "Sorry for the inconvenience, please try again later!";
-			AlertDialog.Builder dialog = GeneralHelper.buildErrorDialog(errMsg,context);
-			dialog.show();
+			System.out.println(errMsg);
 		}
 		return null;
 	}

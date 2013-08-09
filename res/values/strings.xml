@@ -11,6 +11,8 @@
     <string name="confirm_refresh"></string>
     <string name="continue_string">Continue</string>
     <string name="save_string">Save this manga</string>
+    <string name="read_string">Read the manga!</string>
+    <string name="refresh_string">Refresh manga chapters!</string>
     <string name="cancel_string">Cancel</string>
     <string name="confirm_string">Okay!</string>
 
@@ -19,5 +21,6 @@
 
     <string name="title_activity_browse_new">Browse Manga Online</string>
     <string name="title_activity_saved_list">Browse Saved Manga</string>
+    <string name="title_activity_manga_detail">Manga Detail Page</string>
 
 </resources>
